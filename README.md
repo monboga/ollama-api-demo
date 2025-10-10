@@ -22,7 +22,7 @@ La aplicación expone endpoints REST que permiten enviar solicitudes a la API de
 
 1. **Clona el repositorio**
     ```bash
-    git clone https://github.com/tu-usuario/ollama-api-demo.git
+    git clone git@github.com:monboga/ollama-api-demo.git
     cd ollama-api-demo
     ```
 
