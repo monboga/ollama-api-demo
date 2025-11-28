@@ -1,24 +1,24 @@
-# Usa una imagen base de OpenJDK con Maven para construir la aplicación
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# ---------- Etapa 1: Build ----------
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
-# Copia el pom.xml y descarga las dependencias
+# Instalar Maven (no incluido en la imagen base)
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+
+# Copiar pom.xml y descargar dependencias
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copia el resto del código fuente y construye el JAR
+# Copiar el código fuente y compilar el JAR
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Usa una imagen ligera de Java para ejecutar el JAR
-FROM eclipse-temurin:17-jre-alpine
+# ---------- Etapa 2: Runtime ----------
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Copia el JAR generado desde la etapa de build
+# Copiar el JAR compilado
 COPY --from=build /app/target/*.jar app.jar
 
-# Expone el puerto típico de Spring Boot
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
